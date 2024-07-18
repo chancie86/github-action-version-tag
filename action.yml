@@ -27,19 +27,19 @@ outputs:
 runs:
   using: composite
   steps:
+    - uses: actions/checkout@v4
     - name: Run script
       id: git-version
       shell: pwsh
       working-directory: ${{ github.action_path }}
       run: |
-        pwd
-        if (${{ inputs.isPrerelease }} -eq "true") {
+        if ("${{ inputs.isPrerelease }}"" -eq "true") {
           $isPrelease = $true
         } else {
           $isPrelease = $false
         }
 
-        if (${{ inputs.push }} -eq "true") {
+        if ("${{ inputs.push }}"" -eq "true") {
           $push = $true
         } else {
           $push = $false
