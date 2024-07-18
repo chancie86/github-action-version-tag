@@ -27,7 +27,9 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Get next version
+    - name: Set GitHub Path
+      run: echo "$GITHUB_ACTION_PATH" >> ${{ github.action_path }}
+    - name: Run script
       id: git-version
       shell: pwsh
       run: |
@@ -43,7 +45,7 @@ runs:
           $push = $false
         }
 
-        Import-Module ./scripts/chancies-git-version-module.psm1
+        Import-Module ./scripts/Chancies.GitVersion.psm1
         $currentVersion = Get-GitCurrentVersion -Prefix ${{ inputs.versionPrefix }}
         $nextVersion = Get-GitNextVersion -Prefix ${{ inputs.versionPrefix }} -Increment ${{ inputs.incrementType }} -IsPrerelease:$isPrelease
 
