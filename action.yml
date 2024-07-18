@@ -28,6 +28,7 @@ runs:
   using: composite
   steps:
     - name: Set GitHub Path
+      shell: bash
       run: echo "$GITHUB_ACTION_PATH" >> ${{ github.action_path }}
     - name: Run script
       id: git-version
