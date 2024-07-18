@@ -28,8 +28,10 @@ runs:
   using: composite
   steps:
     - name: Set GitHub Path
+      run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
       shell: bash
-      run: echo "$GITHUB_ACTION_PATH" >> ${{ github.action_path }}
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
     - name: Run script
       id: git-version
       shell: pwsh
