@@ -1,0 +1,56 @@
+name: Git Version
+author: Hoi Fong Chan
+description: Gets and, optionally, pushes git version tags
+
+inputs:
+  versionPrefix:
+    description: A git tag prefix. Defaults to 'v'.
+    default: v
+  incrementType:
+    description: The version value to increment. Possible values are Major, Minor, Patch, Build.
+    default: Patch
+  isPrerelease:
+    description: If 'true', appends '-pre' to the patch number and includes the build number.
+    default: false
+  push:
+    description: If 'true', pushes the next version tag to git
+    default: false
+
+outputs:
+  currentVersion:
+    description: The current git tag version
+    value: ${{ steps.git-version.outputs.currentVersion }}
+  nextVersion:
+    description: The next git tag version
+    value: ${{ steps.git-version.outputs.nextVersion }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get next version
+      id: git-version
+      shell: pwsh
+      run: |
+        if (${{ inputs.isPrerelease }} -eq "true") {
+          $isPrelease = $true
+        } else {
+          $isPrelease = $false
+        }
+
+        if (${{ inputs.push }} -eq "true") {
+          $push = $true
+        } else {
+          $push = $false
+        }
+
+        Import-Module ./scripts/chancies-git-version-module.psm1
+        $currentVersion = Get-GitCurrentVersion -Prefix ${{ inputs.versionPrefix }}
+        $nextVersion = Get-GitNextVersion -Prefix ${{ inputs.versionPrefix }} -Increment ${{ inputs.incrementType }} -IsPrerelease:$isPrelease
+
+        # Write to action outputs
+        "currentVersion=$currentVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        "nextVersion=$nextVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+        if ($push) {
+          Set-GitVersion -Prefix ${{ inputs.versionPrefix }} -GitOriginRefName ${{ github.ref_name }} -Version $nextVersion
+        }
