@@ -27,15 +27,12 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Set GitHub Path
-      run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
-      shell: bash
-      env:
-        GITHUB_ACTION_PATH: ${{ github.action_path }}
     - name: Run script
       id: git-version
       shell: pwsh
+      working-directory: ${{ github.action_path }}
       run: |
+        pwd
         if (${{ inputs.isPrerelease }} -eq "true") {
           $isPrelease = $true
         } else {
