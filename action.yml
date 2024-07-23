@@ -30,12 +30,11 @@ runs:
     - name: Run script
       id: git-version
       shell: pwsh
-      working-directory: ${{ github.action_path }}
       run: |
         $isPrelease = "${{ inputs.isPrerelease }}" -eq "true"
         $push = "${{ inputs.push }}" -eq "true"
 
-        Import-Module ./scripts/Chancies.GitVersion.psm1
+        Import-Module ${{ github.action_path }}/scripts/Chancies.GitVersion.psm1
         $currentVersion = Get-GitCurrentVersion -Prefix ${{ inputs.versionPrefix }}
         $nextVersion = Get-GitNextVersion -Prefix ${{ inputs.versionPrefix }} -Increment ${{ inputs.incrementType }} -IsPrerelease:$isPrelease
 
