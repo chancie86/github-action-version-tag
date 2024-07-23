@@ -28,22 +28,15 @@ runs:
   using: composite
   steps:
     - uses: actions/checkout@v4
+    - name: Get tags
+      run: git fetch --tags origin
     - name: Run script
       id: git-version
       shell: pwsh
       working-directory: ${{ github.action_path }}
       run: |
-        if ("${{ inputs.isPrerelease }}" -eq "true") {
-          $isPrelease = $true
-        } else {
-          $isPrelease = $false
-        }
-
-        if ("${{ inputs.push }}" -eq "true") {
-          $push = $true
-        } else {
-          $push = $false
-        }
+        $isPrelease = "${{ inputs.isPrerelease }}" -eq "true"
+        $push = "${{ inputs.push }}" -eq "true"
 
         Import-Module ./scripts/Chancies.GitVersion.psm1
         $currentVersion = Get-GitCurrentVersion -Prefix ${{ inputs.versionPrefix }}
