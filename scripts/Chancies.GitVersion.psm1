@@ -85,7 +85,7 @@ function Set-GitVersionTag {
     $GitOriginRefName
   )
 
-  if ([string]::IsNullOrWhiteSpace($Version)) {
+  if ([string]::IsNullOrWhiteSpace($VersionTag)) {
     throw "Version must have a value"
   }
 

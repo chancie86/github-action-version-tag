@@ -31,6 +31,8 @@ runs:
       id: git-version
       shell: pwsh
       run: |
+        $VerbosePreference = "Continue"
+
         $isPrelease = "${{ inputs.isPrerelease }}" -eq "true"
         $push = "${{ inputs.push }}" -eq "true"
 
@@ -43,5 +45,5 @@ runs:
         "nextVersion=$nextVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
         if ($push) {
-          Set-GitVersionTag -GitOriginRefName ${{ github.ref_name }} -Version $nextVersion
+          Set-GitVersionTag -GitOriginRefName ${{ github.ref_name }} -VersionTag $nextVersion
         }
