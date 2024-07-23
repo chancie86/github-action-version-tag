@@ -7,14 +7,17 @@ inputs:
     description: A git tag prefix. Defaults to 'v'.
     default: v
   incrementType:
-    description: The version value to increment. Possible values are Major, Minor, Patch, Build.
+    description: The version value to increment. Possible values are Major, Minor, Patch.
     default: Patch
   isPrerelease:
-    description: If 'true', appends '-pre' to the patch number and includes the build number.
+    description: If 'true', appends '-pre' to the patch number and includes an auto incremented build number, e.g. 1.0.1-pre.0.
     default: false
   push:
     description: If 'true', pushes the next version tag to git
     default: false
+  preLabel:
+    description: The pre-release label to use, e.g. 'pre' would result in '1.0.0-pre.0'.
+    default: pre
   gitUserName:
     description: Git username
     default: GitHub
@@ -44,7 +47,7 @@ runs:
 
         Import-Module ${{ github.action_path }}/scripts/Chancies.GitVersion.psm1
         $currentVersion = Get-GitCurrentVersionTag -Prefix ${{ inputs.versionPrefix }}
-        $nextVersion = Get-GitNextVersionTag -Prefix ${{ inputs.versionPrefix }} -Increment ${{ inputs.incrementType }} -IsPrerelease:$isPrelease
+        $nextVersion = Get-GitNextVersionTag -Prefix ${{ inputs.versionPrefix }} -Increment ${{ inputs.incrementType }} -PreLabel ${{ inputs.preLabel }} -IsPrerelease:$isPrelease
 
         # Write to action outputs
         "currentVersion=$currentVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append

@@ -18,7 +18,7 @@ function Get-GitCurrentVersionTag {
 function Get-GitNextVersionTag {
   param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet("Major", "Minor", "Patch", "Build")]
+    [ValidateSet("Major", "Minor", "Patch")]
     [string]
     $Increment,
 
@@ -27,59 +27,70 @@ function Get-GitNextVersionTag {
     $Prefix = "v",
 
     [Parameter()]
+    [string]
+    $PreLabel = "pre",
+
+    [Parameter()]
     [switch]
     $IsPrerelease
   )
 
-  $currentTag = Get-GitCurrentVersionTag -Prefix $Prefix
+  $incrementInternal = $Increment
+
+  $currentTag = "v2.0.0-pre.0" #Get-GitCurrentVersionTag -Prefix $Prefix
 
   Write-Verbose "Current tag: $currentTag"
 
   $currentTag = $currentTag.Substring($Prefix.Length, $currentTag.Length - $Prefix.Length)
   $currentTag = $currentTag -replace "[-a-zA-Z]*",""
 
-  Write-Verbose "Normalised version tag: $currentTag"
-
   $currentVersion = [Version]$currentTag
 
+  $major = $currentVersion.Major
+  $minor = $currentVersion.Minor
+  $patch = $currentVersion.Build
+  $build = $currentVersion.Revision
+
+  Write-Verbose "Current version: $major.$minor.$patch.$build"  
+
   if ($IsPrerelease) {
-    $pre = "-pre"
-
-    if ($Increment -eq "Build") {
-      $build = ".$($currentVersion.Revision + 1)"
-    } else {
-      $build = ".0"
-    }
-  } else {
-    if ($Increment -eq "Build") {
-      throw "Build number can only be incremented on Prerelease versions"
+    if ([string]::IsNullOrWhiteSpace($PreLabel)) {
+      throw "PreLabel must have a non empty value"
     }
 
-    $pre = ""
-    $build = ""
+    if ($build -gt -1) {
+      Write-Verbose "Existing pre-release found in next version. Incrementing build number instead."
+      $incrementInternal = "Build"
+    }
   }
 
-  $preSuffix = "$pre$build"
-
-  Write-Verbose "Current version: $currentVersion"
-
-  switch ($Increment)
+  switch ($incrementInternal)
   {
     "Major" {
-      $newVersion = "$($currentVersion.Major + 1).0.0$preSuffix"
+      $major = $major + 1
+      $minor = 0
+      $patch = 0
+      $build = 0
     }
     "Minor" {
-      $newVersion = "$($currentVersion.Major).$($currentVersion.Minor + 1).0$preSuffix"
+      $minor = $minor + 1
+      $patch = 0
+      $build = 0
     }
     "Patch" {
-      $newVersion = "$($currentVersion.Major).$($currentVersion.Minor).$($currentVersion.Build + 1)$preSuffix"
+      $patch = $patch + 1
+      $build = 0
     }
     "Build" {
-      $newVersion = "$($currentVersion.Major).$($currentVersion.Minor).$($currentVersion.Build)$preSuffix"
+      $build = $build + 1
     }
   }
 
-  "$($Prefix)$($newVersion)"
+  if ($IsPrerelease) {
+    "$major.$minor.$patch-$PreLabel.$build"
+  } else {
+    "$major.$minor.$patch"
+  }
 }
 
 function Set-GitVersionTag {
