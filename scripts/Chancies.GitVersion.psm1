@@ -31,7 +31,7 @@ function Get-GitNextVersionTag {
     $IsPrerelease
   )
 
-  $currentTag = Get-GitCurrentVersion -Prefix $Prefix
+  $currentTag = Get-GitCurrentVersionTag -Prefix $Prefix
   $currentVersion = [Version]$currentTag.Substring($Prefix.Length, $currentTag.Length - $Prefix.Length)
 
   if ($IsPrerelease) {
