@@ -32,7 +32,13 @@ function Get-GitNextVersionTag {
   )
 
   $currentTag = Get-GitCurrentVersionTag -Prefix $Prefix
+
+  Write-Verbose "Current tag: $currentTag"
+
+  $currentTag = $currentTag -replace "[-a-zA-Z]*",""
   $currentVersion = [Version]$currentTag.Substring($Prefix.Length, $currentTag.Length - $Prefix.Length)
+
+  Write-Verbose "Normalised version tag: $currentTag"
 
   if ($IsPrerelease) {
     $pre = "-pre"
