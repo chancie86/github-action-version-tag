@@ -4,6 +4,7 @@ function Get-GitCurrentVersion {
     [string]
     $Prefix = "v"
   )
+  Invoke-Expression "git fetch --tags origin"
 
   $versions = @(Invoke-Expression "git tag --list '$Prefix*' --sort '-version:refname'")
 

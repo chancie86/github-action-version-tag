@@ -28,8 +28,6 @@ runs:
   using: composite
   steps:
     - uses: actions/checkout@v4
-    - name: Get tags
-      run: git fetch --tags origin
     - name: Run script
       id: git-version
       shell: pwsh
