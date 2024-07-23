@@ -82,15 +82,23 @@ function Set-GitVersionTag {
 
     [Parameter(Mandatory = $true)]
     [string]
-    $GitOriginRefName
+    $GitOriginRefName,
+
+    [Parameter()]
+    [string]
+    $UserName = "GitHub",
+
+    [Parameter()]
+    [string]
+    $UserEmail = "github@contoso.org"
   )
 
   if ([string]::IsNullOrWhiteSpace($VersionTag)) {
     throw "Version must have a value"
   }
 
-  git config user.email "github@salveapp.co.uk"
-  git config user.name "Github"
+  git config user.email $UserEmail
+  git config user.name $UserName
   git tag -a $VersionTag -m "[Tagged $VersionTag]"
   git push --atomic origin $GitOriginRef $VersionTag
 }
