@@ -1,4 +1,4 @@
-function Get-GitCurrentVersion {
+function Get-GitCurrentVersionTag {
   param(
     [Parameter()]
     [string]
@@ -15,7 +15,7 @@ function Get-GitCurrentVersion {
   $versions[0]
 }
 
-function Get-GitNextVersion {
+function Get-GitNextVersionTag {
   param(
     [Parameter(Mandatory = $true)]
     [ValidateSet("Major", "Minor", "Patch", "Build")]
@@ -71,18 +71,14 @@ function Get-GitNextVersion {
     }
   }
 
-  $newVersion
+  "$($Prefix)$($newVersion)"
 }
 
-function Set-GitVersion {
+function Set-GitVersionTag {
   param(
-    [Parameter()]
-    [string]
-    $Prefix = "v",
-
     [Parameter(Mandatory = $true)]
     [string]
-    $Version,
+    $VersionTag,
 
     [Parameter(Mandatory = $true)]
     [string]
@@ -93,10 +89,8 @@ function Set-GitVersion {
     throw "Version must have a value"
   }
 
-  $versionTag = "$($Prefix)$($Version)"
-  $versionTag
-  # git config user.email "github@salveapp.co.uk"
-  # git config user.name "Github"
-  # git tag -a $versionTag -m "[Tagged $versionTag]"
-  # git push --atomic origin $GitOriginRef $versionTag
+  git config user.email "github@salveapp.co.uk"
+  git config user.name "Github"
+  git tag -a $VersionTag -m "[Tagged $VersionTag]"
+  git push --atomic origin $GitOriginRef $VersionTag
 }

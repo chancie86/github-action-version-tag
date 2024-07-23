@@ -35,13 +35,13 @@ runs:
         $push = "${{ inputs.push }}" -eq "true"
 
         Import-Module ${{ github.action_path }}/scripts/Chancies.GitVersion.psm1
-        $currentVersion = Get-GitCurrentVersion -Prefix ${{ inputs.versionPrefix }}
-        $nextVersion = Get-GitNextVersion -Prefix ${{ inputs.versionPrefix }} -Increment ${{ inputs.incrementType }} -IsPrerelease:$isPrelease
+        $currentVersion = Get-GitCurrentVersionTag -Prefix ${{ inputs.versionPrefix }}
+        $nextVersion = Get-GitNextVersionTag -Prefix ${{ inputs.versionPrefix }} -Increment ${{ inputs.incrementType }} -IsPrerelease:$isPrelease
 
         # Write to action outputs
         "currentVersion=$currentVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
         "nextVersion=$nextVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
         if ($push) {
-          Set-GitVersion -Prefix ${{ inputs.versionPrefix }} -GitOriginRefName ${{ github.ref_name }} -Version $nextVersion
+          Set-GitVersionTag -Prefix ${{ inputs.versionPrefix }} -GitOriginRefName ${{ github.ref_name }} -Version $nextVersion
         }
