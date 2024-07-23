@@ -43,5 +43,5 @@ runs:
         "nextVersion=$nextVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
         if ($push) {
-          Set-GitVersionTag -Prefix ${{ inputs.versionPrefix }} -GitOriginRefName ${{ github.ref_name }} -Version $nextVersion
+          Set-GitVersionTag -GitOriginRefName ${{ github.ref_name }} -Version $nextVersion
         }
