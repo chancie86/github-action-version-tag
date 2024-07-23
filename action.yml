@@ -15,6 +15,12 @@ inputs:
   push:
     description: If 'true', pushes the next version tag to git
     default: false
+  gitUserName:
+    description: Git username
+    default: GitHub
+  gitUserEmail:
+    description: Git email
+    default: github@contoso.org
 
 outputs:
   currentVersion:
@@ -45,5 +51,5 @@ runs:
         "nextVersion=$nextVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
         if ($push) {
-          Set-GitVersionTag -GitOriginRefName ${{ github.ref_name }} -VersionTag $nextVersion
+          Set-GitVersionTag -GitOriginRefName ${{ github.ref_name }} -VersionTag $nextVersion -UserName ${{ inputs.gitUserName }} -UserEmail ${{ inputs.gitUserEmail }}
         }
