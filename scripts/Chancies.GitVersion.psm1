@@ -37,7 +37,7 @@ function Get-GitNextVersionTag {
 
   $incrementInternal = $Increment
 
-  $currentTag = "v2.0.0-pre.0" #Get-GitCurrentVersionTag -Prefix $Prefix
+  $currentTag = Get-GitCurrentVersionTag -Prefix $Prefix
 
   Write-Verbose "Current tag: $currentTag"
 
