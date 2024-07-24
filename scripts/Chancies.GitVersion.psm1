@@ -1,3 +1,25 @@
+function Get-GitVersionWithoutPrefix {
+  param(
+    [Parameter(Mandatory = "true")]
+    [string]
+    $VersionTag,
+
+    [Parameter(Mandatory = "true")]
+    [string]
+    $Prefix
+  )
+
+  if ([string]::IsNullOrWhiteSpace($VersionTag)) {
+    throw "VersionTag must have a non empty value"
+  }
+
+  if ([string]::IsNullOrWhiteSpace($Prefix)) {
+    return $VersionTag
+  }
+
+  $VersionTag.Substring($Prefix.Length)
+}
+
 function Get-GitCurrentVersionTag {
   param(
     [Parameter()]
@@ -12,7 +34,23 @@ function Get-GitCurrentVersionTag {
     throw "No tags found"
   }
 
-  $versions[0]
+  # The git command's sort function doesn't work with pre-release tags, so we apply a
+  # max search using the .NET semver comparator.
+  $max = $versions[0]
+  foreach ($v in $versions) {
+    $versionWithoutPrefix = Get-GitVersionWithoutPrefix -VersionTag $v -Prefix $Prefix
+    $maxWithoutPrefix = Get-GitVersionWithoutPrefix -VersionTag $max -Prefix $Prefix
+
+    try {
+      if ([System.Management.Automation.SemanticVersion]::Compare($versionWithoutPrefix, $maxWithoutPrefix) -gt 0) {
+        $max = $v
+      }
+    } catch [System.Management.Automation.MethodException] {
+      Write-Verbose "Could not compare version $v. $_"
+    }
+  }
+
+  $max
 }
 
 function Get-GitNextVersionTag {
@@ -41,7 +79,7 @@ function Get-GitNextVersionTag {
 
   Write-Verbose "Current tag: $currentTag"
 
-  $currentTag = $currentTag.Substring($Prefix.Length, $currentTag.Length - $Prefix.Length)
+  $currentTag = Get-GitVersionWithoutPrefix -VersionTag $currentTag -Prefix $Prefix
   $currentTag = $currentTag -replace "[-a-zA-Z]*",""
 
   $currentVersion = [Version]$currentTag
@@ -121,3 +159,5 @@ function Set-GitVersionTag {
   git tag -a $VersionTag -m "[Tagged $VersionTag]"
   git push --atomic origin $GitOriginRef $VersionTag
 }
+
+Export-ModuleMember -Function Get-GitCurrentVersionTag,Get-GitNextVersionTag,Set-GitVersionTag
