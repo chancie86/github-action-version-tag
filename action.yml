@@ -1,4 +1,4 @@
-name: Git Version
+name: github-action-version-tag
 author: Hoi Fong Chan
 description: Gets and, optionally, pushes git version tags
 
