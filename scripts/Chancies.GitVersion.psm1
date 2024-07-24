@@ -125,9 +125,9 @@ function Get-GitNextVersionTag {
   }
 
   if ($IsPrerelease) {
-    "$major.$minor.$patch-$PreLabel.$build"
+    "$Prefix$major.$minor.$patch-$PreLabel.$build"
   } else {
-    "$major.$minor.$patch"
+    "$Prefix$major.$minor.$patch"
   }
 }
 
