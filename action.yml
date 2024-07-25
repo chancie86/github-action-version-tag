@@ -10,7 +10,7 @@ inputs:
     description: The version value to increment. Possible values are Major, Minor, Patch.
     default: Patch
   isPrerelease:
-    description: If 'true', appends '-pre' to the patch number and includes an auto incremented build number, e.g. 1.0.1-pre.0.
+    description: If 'true', appends '-pre' to the patch number and includes an auto incremented build number, e.g. '1.0.1-pre.0'.
     default: false
   push:
     description: If 'true', pushes the next version tag to git
@@ -47,7 +47,7 @@ runs:
 
         $isPrelease = "${{ inputs.isPrerelease }}" -eq "true"
         $push = "${{ inputs.push }}" -eq "true"
-        $prefix = "${{ inputs.versionPrefix }}""
+        $prefix = "${{ inputs.versionPrefix }}"
 
         Import-Module ${{ github.action_path }}/scripts/Chancies.GitVersion.psm1
         $currentVersion = Get-GitCurrentVersionTag -Prefix $prefix
