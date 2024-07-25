@@ -30,7 +30,10 @@ outputs:
     description: The current git tag version
     value: ${{ steps.git-version.outputs.currentVersion }}
   nextVersion:
-    description: The next git tag version
+    description: The next git tag version, e.g. MyPrefx-1.0.0-pre.0
+    value: ${{ steps.git-version.outputs.nextVersion }}
+  nextSemanticVersion:
+    description: This is the same as nextVersion without the version prefix, e.g. 1.0.0-pre.0.
     value: ${{ steps.git-version.outputs.nextVersion }}
 
 runs:
@@ -44,14 +47,17 @@ runs:
 
         $isPrelease = "${{ inputs.isPrerelease }}" -eq "true"
         $push = "${{ inputs.push }}" -eq "true"
+        $prefix = "${{ inputs.versionPrefix }}""
 
         Import-Module ${{ github.action_path }}/scripts/Chancies.GitVersion.psm1
-        $currentVersion = Get-GitCurrentVersionTag -Prefix ${{ inputs.versionPrefix }}
-        $nextVersion = Get-GitNextVersionTag -Prefix ${{ inputs.versionPrefix }} -Increment ${{ inputs.incrementType }} -PreLabel ${{ inputs.preLabel }} -IsPrerelease:$isPrelease
+        $currentVersion = Get-GitCurrentVersionTag -Prefix $prefix
+        $nextVersion = Get-GitNextVersionTag -Prefix $prefix -Increment ${{ inputs.incrementType }} -PreLabel ${{ inputs.preLabel }} -IsPrerelease:$isPrelease
+        $nextSemVer = $nextVersion.Substring($prefix.length)
 
         # Write to action outputs
         "currentVersion=$currentVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
         "nextVersion=$nextVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        "nextSemanticVersion=$nextSemVer" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
         if ($push) {
           Set-GitVersionTag -GitOriginRefName ${{ github.ref_name }} -VersionTag $nextVersion -UserName ${{ inputs.gitUserName }} -UserEmail ${{ inputs.gitUserEmail }}
