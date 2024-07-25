@@ -34,7 +34,7 @@ outputs:
     value: ${{ steps.git-version.outputs.nextVersion }}
   nextSemanticVersion:
     description: This is the same as nextVersion without the version prefix, e.g. 1.0.0-pre.0.
-    value: ${{ steps.git-version.outputs.nextVersion }}
+    value: ${{ steps.git-version.outputs.nextSemanticVersion }}
 
 runs:
   using: composite
@@ -45,13 +45,13 @@ runs:
       run: |
         $VerbosePreference = "Continue"
 
-        $isPrelease = "${{ inputs.isPrerelease }}" -eq "true"
+        $isPrerelease = "${{ inputs.isPrerelease }}" -eq "true"
         $push = "${{ inputs.push }}" -eq "true"
         $prefix = "${{ inputs.versionPrefix }}"
 
         Import-Module ${{ github.action_path }}/scripts/Chancies.GitVersion.psm1
         $currentVersion = Get-GitCurrentVersionTag -Prefix $prefix
-        $nextVersion = Get-GitNextVersionTag -Prefix $prefix -Increment ${{ inputs.incrementType }} -PreLabel ${{ inputs.preLabel }} -IsPrerelease:$isPrelease
+        $nextVersion = Get-GitNextVersionTag -Prefix $prefix -Increment ${{ inputs.incrementType }} -PreLabel ${{ inputs.preLabel }} -IsPrerelease:$isPrerelease
         $nextSemVer = $nextVersion.Substring($prefix.length)
 
         # Write to action outputs
